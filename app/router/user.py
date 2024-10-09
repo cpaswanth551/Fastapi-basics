@@ -1,6 +1,7 @@
 from typing import List
 from fastapi import APIRouter, Depends
 
+from app.auth.oauth2 import get_current_user
 from app.db import db_user
 from app.db.database import get_db
 from app.schemas import UserBase, UserDisplay
@@ -22,7 +23,9 @@ def create_user(request: UserBase, db: Session = Depends(get_db)):
 
 
 @router.get("/", response_model=List[UserDisplay])
-def get_all_users(db: Session = Depends(get_db)):
+def get_all_users(
+    db: Session = Depends(get_db), user: UserBase = Depends(get_current_user)
+):
     return db_user.retreive_all_users(db)
 
 
@@ -30,7 +33,9 @@ def get_all_users(db: Session = Depends(get_db)):
 
 
 @router.get("/{id}", response_model=UserDisplay)
-def get_user(id: int, db: Session = Depends(get_db)):
+def get_user(
+    id: int, db: Session = Depends(get_db), user: UserBase = Depends(get_current_user)
+):
     return db_user.retreive_user_byId(db, id)
 
 
@@ -38,7 +43,12 @@ def get_user(id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/{id}/update")
-def update_user(id: int, request: UserBase, db: Session = Depends(get_db)):
+def update_user(
+    id: int,
+    request: UserBase,
+    db: Session = Depends(get_db),
+    user: UserBase = Depends(get_current_user),
+):
     return db_user.update_user(db, id, request)
 
 
@@ -46,7 +56,7 @@ def update_user(id: int, request: UserBase, db: Session = Depends(get_db)):
 
 
 @router.get("/{id}/delete")
-def delete_user(id: int, db: Session = Depends(get_db)):
+def delete_user(
+    id: int, db: Session = Depends(get_db), user: UserBase = Depends(get_current_user)
+):
     return db_user.delete_user(db, id)
-
-
