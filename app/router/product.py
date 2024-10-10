@@ -2,6 +2,7 @@ from typing import List, Optional
 from fastapi import APIRouter, Cookie, Form, Header, Response
 from fastapi.responses import HTMLResponse
 
+from app.custom_log import log
 
 router = APIRouter(prefix="/product", tags=["product"])
 
@@ -39,6 +40,7 @@ def get_all_products(
     custom_header: Optional[List[str]] = Header(None),
     test_cookie: Optional[str] = Cookie(None),  # here cookie is retreived  ....
 ):
+    log(tag="products", message="list all products")
     if custom_header:
         response.headers["custom_response_header"] = " and ".join(custom_header)
 
