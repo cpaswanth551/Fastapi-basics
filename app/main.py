@@ -1,14 +1,14 @@
 from asyncio import create_task
 import time
-from fastapi import FastAPI, Request, status
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI, Request, WebSocket, status
+from fastapi.responses import HTMLResponse, JSONResponse
 from app.db import models, database
 from app.exceptions import StoryException
 from app.router import blog_get, blog_post, file, product, user, article
 from fastapi.middleware.cors import CORSMiddleware
 from app.auth import authentication
 from fastapi.staticfiles import StaticFiles
-
+from app.client import html
 from app.templates import templates
 
 app = FastAPI()
@@ -28,6 +28,24 @@ def story_exception_handler(request: Request, exc: StoryException):
     return JSONResponse(
         status_code=status.HTTP_418_IM_A_TEAPOT, content={"detail": exc.name}
     )
+
+
+@app.get("/")
+async def get():
+    return HTMLResponse(html)
+
+
+clients = []
+
+
+@app.websocket("/chat")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    clients.append(websocket)
+    while True:
+        data = await websocket.receive_text()
+        for client in clients:
+            await client.send_text(data)
 
 
 models.Base.metadata.create_all(database.engine)
