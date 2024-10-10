@@ -4,7 +4,7 @@ from fastapi import FastAPI, Request, WebSocket, status
 from fastapi.responses import HTMLResponse, JSONResponse
 from app.db import models, database
 from app.exceptions import StoryException
-from app.router import blog_get, blog_post, file, product, user, article
+from app.router import blog_get, blog_post, dependencies, file, product, user, article
 from fastapi.middleware.cors import CORSMiddleware
 from app.auth import authentication
 from fastapi.staticfiles import StaticFiles
@@ -13,6 +13,8 @@ from app.templates import templates
 
 app = FastAPI()
 
+
+app.include_router(dependencies.router)
 app.include_router(templates.router)
 app.include_router(authentication.router)
 app.include_router(user.router)
