@@ -6,6 +6,7 @@ from app.exceptions import StoryException
 from app.router import blog_get, blog_post, file, product, user, article
 from fastapi.middleware.cors import CORSMiddleware
 from app.auth import authentication
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
 
@@ -37,3 +38,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+app.mount("/files", StaticFiles(directory="files"), name="files")
